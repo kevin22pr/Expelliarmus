@@ -18,6 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let categoryScreen = ViewController()
         let navigationController = UINavigationController(rootViewController: categoryScreen)
         
+        navigationController.title = "First"
+        
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
