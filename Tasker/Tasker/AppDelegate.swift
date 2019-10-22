@@ -14,14 +14,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        let categoryScreen = ViewController()
-        let navigationController = UINavigationController(rootViewController: categoryScreen)
-        
-        navigationController.title = "First"
-        
+
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = navigationController
+        window?.rootViewController = NavigationViewController(rootViewController: ViewController())
         window?.makeKeyAndVisible()
         
         return true
