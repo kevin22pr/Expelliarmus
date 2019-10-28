@@ -18,13 +18,12 @@ class CategoryTableViewController: UIViewController {
     
     let tableView = UITableView()
     var safeArea: UILayoutGuide!
-    
-    var characters = ["One", "Two", "Three", "Four"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
         setUpNavigationBar()
+        loadItems()
         view.backgroundColor = .white
     }
     
@@ -50,27 +49,27 @@ class CategoryTableViewController: UIViewController {
         let alert = UIAlertController.init(title: "Add a Category", message: "the button was pressed", preferredStyle: .alert)
 
         let action = UIAlertAction.init(title: "Add Category", style: .default) { (action) in
-            //what will happen once the user taps on the button in the nav bar
-
-
             let newCategory = Category(context: self.context)
             newCategory.name = textField.text!
-
-
             self.categoryArray.append(newCategory)
             self.saveItems()
         }
+        
+        let cancelAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
 
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create New Category"
             textField = alertTextField
         }
         alert.addAction(action)
+        alert.addAction(cancelAction)
         present(alert, animated: true, completion: nil)
     }
     
     @objc func selectorLeft(sender: UIButton!) {
         print("Button pressed")
+        let settings = SettingsViewController()
+        self.navigationController?.pushViewController(settings, animated: true)
     }
     
     func setupTableView() {
@@ -82,7 +81,7 @@ class CategoryTableViewController: UIViewController {
         tableView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CategoryCell")
         
         tableView.dataSource = self
         tableView.delegate = self
@@ -91,15 +90,22 @@ class CategoryTableViewController: UIViewController {
 
 extension CategoryTableViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return characters.count
+        return categoryArray.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-    cell.textLabel?.text = characters[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let category = categoryArray[indexPath.row]
+        
+        cell.textLabel?.text = category.name
+        
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        present(ItemViewController(), animated: true, completion: nil)
+        let destinationVC = ItemViewController()
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = categoryArray[indexPath.row]
+            self.navigationController?.pushViewController(destinationVC, animated: true)
+        }
     }
     
     // MARK: - Tableview Datasource Method
