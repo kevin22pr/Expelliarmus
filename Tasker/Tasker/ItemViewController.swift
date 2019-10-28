@@ -11,6 +11,7 @@ import CoreData
 
 class ItemViewController: UIViewController {
     var itemArray = [Item]()
+    var filteredItemArray: [Item] = []
     let tableView = UITableView()
     let searchController = UISearchController(searchResultsController: nil)
 
@@ -21,6 +22,10 @@ class ItemViewController: UIViewController {
     }
     var isSearchBarEmpty: Bool {
       return searchController.searchBar.text?.isEmpty ?? true
+    }
+    
+    var isFiltering: Bool {
+        return searchController.isActive && !isSearchBarEmpty
     }
     
     
@@ -126,13 +131,23 @@ extension ItemViewController: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        if isFiltering {
+            return filteredItemArray.count
+        }
         return itemArray.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         let cell = tableView.dequeueReusableCell(withIdentifier: "itemCell", for: indexPath)
-        let item = itemArray[indexPath.row]
+        let item: Item
+        
+        if isFiltering {
+            item = filteredItemArray[indexPath.row]
+        } else {
+            item = itemArray[indexPath.row]
+        }
 
         cell.textLabel?.text = item.title
         cell.accessoryType = item.status ? .checkmark : . none
@@ -154,12 +169,14 @@ extension ItemViewController: UISearchBarDelegate, UISearchResultsUpdating {
     func setUpSearchBar() {
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search Candies"
+        searchController.searchBar.placeholder = "Search Tasks"
         navigationItem.searchController = searchController
         definesPresentationContext = true
     }
+    
     func updateSearchResults(for searchController: UISearchController) {
-      // TODO
+        let searchBar = searchController.searchBar
+        filterContentForSearchText(searchBar.text!)
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -169,13 +186,13 @@ extension ItemViewController: UISearchBarDelegate, UISearchResultsUpdating {
         loadItems(with: request, predicate: predicate)
     }
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {
-            loadItems()
-            DispatchQueue.main.async {
-                searchBar.resignFirstResponder()
-            }
+    func filterContentForSearchText(_ searchText: String) {
+        filteredItemArray = itemArray.filter {
+            (item: Item) -> Bool in
+            return (item.title?.lowercased().contains(searchText.lowercased()))!
         }
+      
+      tableView.reloadData()
     }
 }
 
