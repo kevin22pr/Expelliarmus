@@ -36,7 +36,7 @@ class CategoryTableViewController: UIViewController {
             action: #selector(selectorLeft(sender:)))
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Add Task",
+            title: "Add Category",
             style: .plain,
             target: self,
             action: #selector(selectorRight(sender:)))
